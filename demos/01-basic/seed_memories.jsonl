@@ -1,0 +1,6 @@
+{"text": "The user prefers metric units and concise, direct answers.", "tags": ["preference", "units"], "source": "onboarding"}
+{"text": "Deployed the trading bot to paper mode on 2026-06-08.", "tags": ["ops"], "source": "log"}
+{"text": "The user is most interested in uranium, critical minerals, and nuclear energy plays.", "tags": ["preference", "thesis"], "source": "conversation"}
+{"text": "The capital of France is Paris.", "tags": ["fact"], "source": "reference"}
+{"text": "Always confirm before placing live orders; default to paper trading.", "tags": ["policy", "ops"], "source": "policy"}
+{"text": "The user's primary watchlist ticker is GEV.", "tags": ["watchlist", "equities"], "source": "conversation"}
