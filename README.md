@@ -14,6 +14,12 @@ remember(text)  ->  persisted memory with metadata
 recall(query)   ->  ranked list of the most relevant memories
 ```
 
+<!-- cognis:layman:start -->
+## What is this?
+
+engram is a simple memory system for AI agents and automation tools — it lets your programs remember things between sessions without needing any cloud service or external database. You give it a piece of text to store, and later you ask it a question in plain English; it finds and returns the most relevant things it remembers. Everything is saved in a single file on your computer, works entirely offline, and connects out of the box with AI tools that support the Model Context Protocol (MCP) standard.
+<!-- cognis:layman:end -->
+
 ## Why engram
 
 Most agent "memory" implementations are bolted to a particular model provider, a hosted
@@ -31,6 +37,42 @@ takes the opposite stance:
   read, audit, and reason about exactly why a memory was recalled.
 - **MCP-native.** Ships a Model Context Protocol server so MCP-aware clients get
   `remember` / `recall` / `forget` / `list_memories` tools out of the box.
+
+<!-- cognis:install:start -->
+## Install
+
+`engram` is source-available (not published to PyPI) — every method below installs
+straight from GitHub. Pick whichever you prefer; the one-line scripts auto-detect
+the best tool available on your machine.
+
+**One-liner (Linux / macOS):**
+```sh
+curl -fsSL https://raw.githubusercontent.com/cognis-digital/engram/HEAD/install.sh | sh
+```
+
+**One-liner (Windows PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/cognis-digital/engram/HEAD/install.ps1 | iex
+```
+
+**Or install manually — any one of:**
+```sh
+pipx install "git+https://github.com/cognis-digital/engram.git"     # isolated (recommended)
+uv tool install "git+https://github.com/cognis-digital/engram.git"  # uv
+pip install "git+https://github.com/cognis-digital/engram.git"      # pip
+```
+
+**From source:**
+```sh
+git clone https://github.com/cognis-digital/engram.git
+cd engram && pip install .
+```
+
+Then run:
+```sh
+engram --help
+```
+<!-- cognis:install:end -->
 
 ## Install
 
