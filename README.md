@@ -14,6 +14,33 @@ remember(text)  ->  persisted memory with metadata
 recall(query)   ->  ranked list of the most relevant memories
 ```
 
+## Usage — step by step
+
+1. Install the CLI (console-scripts: `engram` and `engram-mcp`):
+   ```bash
+   pipx install "git+https://github.com/cognis-digital/engram.git"
+   engram --version
+   ```
+2. Store a memory, optionally with tags, source provenance, and JSON metadata:
+   ```bash
+   engram remember "User prefers dark mode" --tags ui,prefs --source onboarding
+   ```
+3. Recall the most relevant memories for a query (filter by tag, cap results):
+   ```bash
+   engram recall "what UI settings does the user like?" --limit 5 --tag prefs
+   ```
+4. Inspect and manage the store — list, fetch by id, view stats, and delete:
+   ```bash
+   engram list --limit 50
+   engram get 1
+   engram stats
+   engram forget 1
+   ```
+5. Give an agent durable memory over MCP by running the bundled server:
+   ```bash
+   engram-mcp
+   ```
+
 ## Why engram
 
 Most agent "memory" implementations are bolted to a particular model provider, a hosted
