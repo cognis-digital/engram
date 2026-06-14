@@ -18,6 +18,7 @@ import argparse
 import datetime as _dt
 import json
 import os
+import sqlite3
 import sys
 from typing import List, Optional, Sequence
 
@@ -25,6 +26,28 @@ from . import TOOL_NAME, TOOL_VERSION
 from .memory import MemoryStore
 
 _DEFAULT_DB = os.environ.get("ENGRAM_DB", "engram_memory.sqlite")
+
+
+def _positive_int(value: str) -> int:
+    """argparse type helper: int that must be >= 1."""
+    try:
+        n = int(value)
+    except (TypeError, ValueError):
+        raise argparse.ArgumentTypeError(f"expected a positive integer, got {value!r}")
+    if n < 1:
+        raise argparse.ArgumentTypeError(f"must be at least 1, got {n}")
+    return n
+
+
+def _nonneg_int(value: str) -> int:
+    """argparse type helper: int that must be >= 0."""
+    try:
+        n = int(value)
+    except (TypeError, ValueError):
+        raise argparse.ArgumentTypeError(f"expected a non-negative integer, got {value!r}")
+    if n < 0:
+        raise argparse.ArgumentTypeError(f"must be >= 0, got {n}")
+    return n
 
 
 def _parse_tags(raw: Optional[str]) -> List[str]:
@@ -82,15 +105,15 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_rec = sub.add_parser("recall", help="Retrieve relevant memories.")
     p_rec.add_argument("query", help="The query to search memory with.")
-    p_rec.add_argument("--limit", type=int, default=5, help="Max results (default 5).")
+    p_rec.add_argument("--limit", type=_positive_int, default=5, help="Max results (default 5).")
     p_rec.add_argument("--tag", help="Only consider memories with this tag.")
     p_rec.add_argument(
         "--min-score", type=float, default=0.0, help="Drop hits below this score."
     )
 
     p_list = sub.add_parser("list", help="List stored memories.")
-    p_list.add_argument("--limit", type=int, default=50)
-    p_list.add_argument("--offset", type=int, default=0)
+    p_list.add_argument("--limit", type=_positive_int, default=50)
+    p_list.add_argument("--offset", type=_nonneg_int, default=0)
     p_list.add_argument("--tag", help="Only list memories with this tag.")
     p_list.add_argument(
         "--oldest-first", action="store_true", help="List oldest first."
@@ -113,12 +136,16 @@ def _emit(args: argparse.Namespace, payload) -> None:
 
 
 def _cmd_remember(store: MemoryStore, args: argparse.Namespace) -> int:
-    mem = store.remember(
-        args.text,
-        tags=_parse_tags(args.tags),
-        source=args.source,
-        metadata=_parse_metadata(args.metadata),
-    )
+    try:
+        mem = store.remember(
+            args.text,
+            tags=_parse_tags(args.tags),
+            source=args.source,
+            metadata=_parse_metadata(args.metadata),
+        )
+    except ValueError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
     if args.json:
         _emit(args, mem.to_dict())
     else:
@@ -217,9 +244,16 @@ _DISPATCH = {
 def main(argv: Optional[Sequence[str]] = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
-    store = MemoryStore(args.db)
+    try:
+        store = MemoryStore(args.db)
+    except (sqlite3.OperationalError, OSError) as exc:
+        print(f"error: cannot open database {args.db!r}: {exc}", file=sys.stderr)
+        return 2
     try:
         return _DISPATCH[args.command](store, args)
+    except (ValueError, TypeError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
     finally:
         store.close()
 

@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import sqlite3
 import sys
 from typing import Any, Dict, Optional
 
@@ -193,11 +194,23 @@ class EngramMCPServer:
         query = args.get("query")
         if not isinstance(query, str) or not query.strip():
             raise _ToolError("'query' is required and must be a non-empty string")
+        raw_limit = args.get("limit", 5)
+        try:
+            limit = int(raw_limit)
+        except (TypeError, ValueError):
+            raise _ToolError(f"'limit' must be an integer, got {raw_limit!r}")
+        if limit < 1:
+            raise _ToolError(f"'limit' must be at least 1, got {limit!r}")
+        raw_min_score = args.get("min_score", 0.0)
+        try:
+            min_score = float(raw_min_score)
+        except (TypeError, ValueError):
+            raise _ToolError(f"'min_score' must be a number, got {raw_min_score!r}")
         hits = self.store.recall(
             query,
-            limit=int(args.get("limit", 5)),
+            limit=limit,
             tag=args.get("tag"),
-            min_score=float(args.get("min_score", 0.0)),
+            min_score=min_score,
         )
         return {"query": query, "results": [h.to_dict() for h in hits]}
 
@@ -208,7 +221,14 @@ class EngramMCPServer:
         return {"ok": self.store.forget(mem_id), "id": mem_id}
 
     def _tool_list_memories(self, args: Dict[str, Any]) -> Dict[str, Any]:
-        mems = self.store.list(limit=int(args.get("limit", 20)), tag=args.get("tag"))
+        raw_limit = args.get("limit", 20)
+        try:
+            limit = int(raw_limit)
+        except (TypeError, ValueError):
+            raise _ToolError(f"'limit' must be an integer, got {raw_limit!r}")
+        if limit < 1:
+            raise _ToolError(f"'limit' must be at least 1, got {limit!r}")
+        mems = self.store.list(limit=limit, tag=args.get("tag"))
         return {"memories": [m.to_dict() for m in mems]}
 
 
@@ -258,8 +278,12 @@ def serve_stdio(store: MemoryStore, stdin=None, stdout=None) -> None:
 
 
 def _write(stdout, obj: Dict[str, Any]) -> None:
-    stdout.write(json.dumps(obj) + "\n")
-    stdout.flush()
+    try:
+        stdout.write(json.dumps(obj) + "\n")
+        stdout.flush()
+    except BrokenPipeError:
+        # Client closed the pipe; nothing more to write.
+        pass
 
 
 def main(argv=None) -> int:
@@ -273,7 +297,11 @@ def main(argv=None) -> int:
         help="Path to the SQLite memory file.",
     )
     args = parser.parse_args(argv)
-    store = MemoryStore(args.db)
+    try:
+        store = MemoryStore(args.db)
+    except (sqlite3.OperationalError, OSError) as exc:
+        print(f"[engram-mcp] error: cannot open database {args.db!r}: {exc}", file=sys.stderr)
+        return 2
     print(
         f"[engram-mcp] serving {SERVER_NAME} v{SERVER_VERSION} over stdio "
         f"(db={args.db})",

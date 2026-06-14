@@ -96,7 +96,7 @@ class MCPDispatchTests(unittest.TestCase):
         stdin = io.StringIO("\n".join(lines) + "\n")
         stdout = io.StringIO()
         serve_stdio(self.store, stdin=stdin, stdout=stdout)
-        out_lines = [l for l in stdout.getvalue().splitlines() if l.strip()]
+        out_lines = [ln for ln in stdout.getvalue().splitlines() if ln.strip()]
         self.assertEqual(len(out_lines), 2)
         init_resp = json.loads(out_lines[0])
         self.assertEqual(init_resp["result"]["serverInfo"]["name"], "engram")

@@ -273,6 +273,14 @@ class MemoryStore:
         newest_first: bool = True,
     ) -> List[Memory]:
         """List stored memories, most-recent first by default."""
+        if not isinstance(limit, int) or isinstance(limit, bool):
+            raise TypeError(f"limit must be an int, got {type(limit).__name__!r}")
+        if limit < 1:
+            raise ValueError(f"limit must be at least 1, got {limit!r}")
+        if not isinstance(offset, int) or isinstance(offset, bool):
+            raise TypeError(f"offset must be an int, got {type(offset).__name__!r}")
+        if offset < 0:
+            raise ValueError(f"offset must be >= 0, got {offset!r}")
         order = "DESC" if newest_first else "ASC"
         rows = self._conn.execute(
             f"SELECT * FROM memories ORDER BY created_at {order}"
@@ -296,6 +304,14 @@ class MemoryStore:
         each candidate memory, optionally blended with a recency boost. Memories
         that share no terms with the query score 0 and are filtered out.
         """
+        if not isinstance(limit, int) or isinstance(limit, bool):
+            raise TypeError(f"limit must be an int, got {type(limit).__name__!r}")
+        if limit < 1:
+            raise ValueError(f"limit must be at least 1, got {limit!r}")
+        try:
+            min_score = float(min_score)
+        except (TypeError, ValueError):
+            raise ValueError(f"min_score must be a number, got {min_score!r}")
         query = (query or "").strip()
         if not query:
             return []
