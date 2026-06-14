@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "engram"
-version = "0.1.0"
+version = "0.1.1"
 description = "Durable, model-agnostic long-term memory for AI agents — stdlib, SQLite, MCP-native."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -41,6 +41,7 @@ classifiers = [
 dependencies = []
 
 [project.optional-dependencies]
+connect = ["cognis-connect @ git+https://github.com/cognis-digital/cognis-connect.git"]
 dev = ["pytest>=8.0"]
 
 [project.urls]
@@ -48,6 +49,7 @@ Homepage = "https://cognis.digital"
 Repository = "https://github.com/cognis-digital/engram"
 
 [project.scripts]
+"engram-emit" = "engram.connect:emit_main"
 engram = "engram.cli:main"
 engram-mcp = "engram.mcp_server:main"
 
