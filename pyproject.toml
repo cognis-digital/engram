@@ -58,3 +58,6 @@ packages = ["engram"]
 
 [tool.setuptools.package-data]
 engram = ["py.typed"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
