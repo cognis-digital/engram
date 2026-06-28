@@ -1,0 +1,10 @@
+$ engram-emit stats
+
+path                     engram_memory.sqlite
+memories                 0
+vocabulary_terms         0
+oldest_created_at        None
+newest_created_at        None
+recency_halflife_days    30.0
+recency_weight           0.15
+schema_version           1

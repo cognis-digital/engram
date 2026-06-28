@@ -14,6 +14,57 @@ remember(text)  ->  persisted memory with metadata
 recall(query)   ->  ranked list of the most relevant memories
 ```
 
+
+<!-- cognis:example:start -->
+## 🔎 Example output
+
+Real, reproducible output from the tool — runs offline:
+
+```console
+$ engram-emit --version
+engram 0.1.0
+```
+
+```console
+$ engram-emit --help
+usage: engram [-h] [--version] [--db DB] [--json]
+              {remember,recall,list,get,forget,stats} ...
+
+Durable, model-agnostic long-term memory for AI agents.
+
+positional arguments:
+  {remember,recall,list,get,forget,stats}
+    remember            Store a new memory.
+    recall              Retrieve relevant memories.
+    list                List stored memories.
+    get                 Fetch a single memory by id.
+    forget              Delete a memory by id.
+    stats               Show store statistics.
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  --db DB               Path to the SQLite memory file (default:
+                        'engram_memory.sqlite').
+  --json                Emit machine-readable JSON instead of human text.
+```
+
+```console
+$ engram-emit stats
+path                     engram_memory.sqlite
+memories                 0
+vocabulary_terms         0
+oldest_created_at        None
+newest_created_at        None
+recency_halflife_days    30.0
+recency_weight           0.15
+schema_version           1
+```
+
+> Blocks above are real `engram` output — reproduce them from a clone.
+
+<!-- cognis:example:end -->
+
 ## Usage — step by step
 
 1. Install the CLI (console-scripts: `engram` and `engram-mcp`):

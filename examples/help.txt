@@ -1,0 +1,22 @@
+$ engram-emit --help
+
+usage: engram [-h] [--version] [--db DB] [--json]
+              {remember,recall,list,get,forget,stats} ...
+
+Durable, model-agnostic long-term memory for AI agents.
+
+positional arguments:
+  {remember,recall,list,get,forget,stats}
+    remember            Store a new memory.
+    recall              Retrieve relevant memories.
+    list                List stored memories.
+    get                 Fetch a single memory by id.
+    forget              Delete a memory by id.
+    stats               Show store statistics.
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  --db DB               Path to the SQLite memory file (default:
+                        'engram_memory.sqlite').
+  --json                Emit machine-readable JSON instead of human text.
